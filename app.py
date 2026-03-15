@@ -74,7 +74,8 @@ avg_signal = df["Signal_Score"].mean()
 c1, c2, c3 = st.columns(3)
 c1.metric("Total Events", total_events)
 c2.metric("Firms Covered", total_firms)
-c3.metric("Average Signal Score", f"{avg_signal:.4f}")
+c3.metric("Sample Mean Signal Score", f"{avg_signal:.4f}")
+st.caption("In this small demo dataset, positive and negative event scores roughly offset each other, so the sample mean is near zero.")
 
 # ---------- Selected Event Summary ----------
 st.markdown("---")
