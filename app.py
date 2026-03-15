@@ -1,6 +1,5 @@
 import streamlit as st
 import pandas as pd
-import numpy as np
 
 st.set_page_config(page_title="ESG Event Study Demo", layout="wide")
 
@@ -36,14 +35,20 @@ with st.expander("How to read this app"):
 **Suggested reading flow**
 1. Use the sidebar to choose a **firm** and **event date**
 2. Review the **Selected Event Summary**
-3. Check the **event detail row** for supporting metrics
-4. Compare the selected event against the firm's **full event history**
-5. Use the **trend chart** to see how the firm's signal changes across events
+3. Check the **Plain-English Interpretation**
+4. Review the **Key Supporting Metrics**
+5. Compare the selected event against the firm's **full event history**
+6. Use the **trend chart** to see how the firm's signal changes across events
 
 **How to interpret Signal Score**
 - Higher values generally indicate more **stabilizing / confirmatory** behavior
 - Lower values indicate more **uncertainty-leaning / mixed** behavior
 - The bins are intended as a **communication layer** rather than a hard trading signal
+
+**Class vs. Signal Bin**
+- **Class** is the higher-level event interpretation label
+- **Signal_Bin** is a communication-oriented bucket derived from the continuous **Signal Score**
+- They are related, but they do not have to match one-for-one
 """)
 
 # ---------- Sidebar ----------
@@ -64,14 +69,12 @@ st.subheader("Project Snapshot")
 
 total_events = len(df)
 total_firms = df["Firm"].nunique()
-# avg_signal = round(df["Signal_Score"].mean(), 4)
 avg_signal = df["Signal_Score"].mean()
-c3.metric("Average Signal Score", f"{avg_signal:.4f}")
 
 c1, c2, c3 = st.columns(3)
 c1.metric("Total Events", total_events)
 c2.metric("Firms Covered", total_firms)
-c3.metric("Average Signal Score", avg_signal)
+c3.metric("Average Signal Score", f"{avg_signal:.4f}")
 
 # ---------- Selected Event Summary ----------
 st.markdown("---")
@@ -81,7 +84,7 @@ col1, col2, col3, col4 = st.columns(4)
 col1.metric("Firm", str(selected_row["Firm"]))
 col2.metric("Event Date", str(selected_row["Event_Date"]))
 col3.metric("Class", str(selected_row["Class"]))
-col4.metric("Signal Score", round(float(selected_row["Signal_Score"]), 4))
+col4.metric("Signal Score", f"{float(selected_row['Signal_Score']):.4f}")
 
 bin_value = selected_row["Signal_Bin"] if "Signal_Bin" in selected_row.index else "N/A"
 st.info(f"**Interpretation Bin:** {bin_value}")
@@ -94,10 +97,10 @@ event_class = str(selected_row["Class"])
 signal_bin = str(selected_row["Signal_Bin"]) if "Signal_Bin" in selected_row.index else "N/A"
 
 explanation = f"""
-For **{selected_firm}** on **{selected_event}**, the event is labeled **{event_class}** with a **Signal Score of {signal_score:.4f}**.
+For **{selected_firm}** on **{selected_event}**, the event is labeled **{event_class}** and receives a **Signal Score of {signal_score:.4f}**.
 
-This suggests the event is currently leaning toward **{signal_bin.lower()}** behavior within the interpretation framework.
-The detailed row below provides the supporting inputs used for that summary, including price and volume-related signals.
+In this framework, that score falls into the **{signal_bin}** interpretation bucket.  
+The class and the bin are related but serve slightly different purposes: the class summarizes the event type, while the bin translates the score into a more communication-friendly interpretation.
 """
 st.write(explanation)
 
@@ -164,12 +167,17 @@ st.markdown("---")
 st.subheader("Method Notes")
 
 st.markdown("""
-This app is a lightweight review layer built on top of the project’s event-level output table.
+This app is a lightweight review layer built on top of the project's event-level output table.
 
 **Underlying idea**
 - Each disclosure event is evaluated using market response features
 - The framework combines these inputs into a continuous **Signal Score**
 - The score is translated into communication-friendly categories for easier interpretation
+
+**Class vs. Signal Bin**
+- **Class** is the higher-level event interpretation label
+- **Signal_Bin** is a communication-oriented bucket derived from the continuous **Signal Score**
+- They are related, but they do not have to match exactly one-for-one
 
 **What this app is for**
 - Reviewing event-level outputs interactively
