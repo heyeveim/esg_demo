@@ -64,7 +64,9 @@ st.subheader("Project Snapshot")
 
 total_events = len(df)
 total_firms = df["Firm"].nunique()
-avg_signal = round(df["Signal_Score"].mean(), 4)
+# avg_signal = round(df["Signal_Score"].mean(), 4)
+avg_signal = df["Signal_Score"].mean()
+c3.metric("Average Signal Score", f"{avg_signal:.4f}")
 
 c1, c2, c3 = st.columns(3)
 c1.metric("Total Events", total_events)
